@@ -35,7 +35,6 @@ def create_app():
             raise Exception(error_msg)
 
         response = handle_request(data.get("text"))
-
         return Response(status=200)
 
     return app
