@@ -3,6 +3,7 @@ from app.config import load_config
 from app.config.database import connect_db, close_db_connection
 import json
 from app.utils.validators import BotChatValidator
+from app.layer import handle_request
 
 def generate_database_connection_string(config_variables):
     username,password = config_variables['DB_USER'],config_variables['DB_PASSWORD']
@@ -32,7 +33,8 @@ def create_app():
 
         if not is_valid:
             raise Exception(error_msg)
-        # Pass through NLP to understand text
+
+        response = handle_request(data.get("text"))
 
         return Response(status=200)
 
