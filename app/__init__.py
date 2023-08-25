@@ -5,7 +5,8 @@ import json
 from app.utils.validators import BotChatValidator
 
 def generate_database_connection_string(config_variables):
-    return ""
+    username,password = config_variables['DB_USER'],config_variables['DB_PASSWORD']
+    return f"mongodb+srv://{username}:{password}@cluster0.9jgzm.mongodb.net/?retryWrites=true&w=majority"
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
