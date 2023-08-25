@@ -6,7 +6,7 @@ from app.utils.validators import BotChatValidator
 from app.layer import handle_request
 
 def generate_database_connection_string(config_variables):
-    username,password = config_variables['DB_USER'],config_variables['DB_PASSWORD']
+    username, password = config_variables['DB_USER'],config_variables['DB_PASSWORD']
     return f"mongodb+srv://{username}:{password}@cluster0.9jgzm.mongodb.net/?retryWrites=true&w=majority"
 
 def create_app():

@@ -7,8 +7,9 @@ import json
 class Jira:
     def __init__(self):
         config = load_config()
-        token = config.get("JIRA_TOKEN", "ATATT3xFfGF0WITeGAdrDe1MsSt-UCTxb9ReV4IbdBVpGwhOUtVvvDY1ht07KOD7yFxs0AVpZrK3a_n4hJ5wkUqFGuWLkBRD5QB1vzagmzPxTAxLVW8AN8iW9TEUbdeFXhbNyqhjLZL78cXSMs5bl3cNSnATe2PCQ5c_WnI-sDU_wVdWTOt9ACw=C89EEEE2")
-        self.auth = HTTPBasicAuth("anchit.dhar@tifin.com", token)
+        token = config.get("JIRA_TOKEN")
+        jira_email = config.get("JIRA_EMAIL")
+        self.auth = HTTPBasicAuth(jira_email, token)
         # Project URL in env
         self.project_url = "https://magnifi-dev.atlassian.net"
         self.headers = {
