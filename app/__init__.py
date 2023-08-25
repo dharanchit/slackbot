@@ -29,12 +29,12 @@ def create_app():
         data = json.loads(body)
 
         # Validate the data
-        is_valid, error_msg  = BotChatValidator(data)
+        is_valid, error_msg, idx_match_tuple  = BotChatValidator(data)
 
         if not is_valid:
             raise Exception(error_msg)
 
-        response = handle_request(data.get("text"))
+        response = handle_request(data.get("text"), idx_match_tuple)
         return Response(status=200)
 
     return app
