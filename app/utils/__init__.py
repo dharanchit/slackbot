@@ -59,3 +59,18 @@ def styledResponse(response):
         ]
     }
     return payload
+
+def chatPreview(response):
+    payload={
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": response,
+                    "emoji": True
+                }
+            }
+        ]
+    }
+    return payload
