@@ -2,7 +2,7 @@ from flask import Flask, request, Response,jsonify
 from app.config import load_config
 from app.config.database import connect_db, close_db_connection
 from app.utils.validators import ChatTextValidator
-from app.utils import ChatBotModalView, updatedChatView, chatPreview, styledResponse, get_project_id
+from app.utils import ChatBotModalView, updatedChatView, chatPreview, styledResponse, get_project_id,format_response_message
 from app.layer import generation_ops
 import json
 from slack_sdk import WebClient
@@ -99,16 +99,17 @@ def create_app():
 
             # generation_ops(body)
 
-            send_chat_message(payload['user']['id']  , f"{submitted_value} :white_check_mark:")
+            send_chat_message(payload['user']['id'] ,prediction)
             return jsonify(updatedChatView(submitted_value))
         except SlackApiError as e:
             return jsonify(styledResponse(f"*Error opening modal: {e.response['error']}!*"))
 
-    def send_chat_message(user_id, message):
+    def send_chat_message(user_id, prediction):
+        response_message = format_response_message(prediction)
         try:
             response = web_client.chat_postMessage(
                 channel=user_id,
-                text=message
+                text=response_message
             )
             return jsonify(styledResponse('Bottt'))
         except SlackApiError as e:
