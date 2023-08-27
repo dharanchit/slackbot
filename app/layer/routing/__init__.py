@@ -1,17 +1,10 @@
 from app.integrations.jira import Jira
-from app.constants.projects import PROJECTS_LIST
 
-def JiraOps(meta_data, match_tuple):
+def JiraOps(meta_data):
     # Replace Hard coded thing with None
     action_type = meta_data.get("ACTION_TYPE", "CREATE")
 
-    index_match = None
-    if match_tuple[0] != -1:
-        index_match = match_tuple[0]
-    else:
-        index_match = match_tuple[1]
-
-    project_id = PROJECTS_LIST[index_match].get("id")
+    project_id = meta_data.get("PROJECT_ID")
 
     jira = Jira()
     if action_type == "CREATE" and meta_data.get("SUB_TYPE", "TICKET").upper() == "TICKET":

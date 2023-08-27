@@ -6,21 +6,21 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - mongodb
+      # - mongodb
       - redis
     volumes:
       - .:/code
-  mongodb:
-    image: mongo
-    restart: always
-    ports:
-      - "27018:27018"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-      MONGO_INITDB_DATABASE: slack-bot
-    volumes:
-      - mongodb-data:/data/db
+  # mongodb:
+  #   image: mongo
+  #   restart: always
+  #   ports:
+  #     - "27018:27018"
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: admin
+  #     MONGO_INITDB_ROOT_PASSWORD: admin
+  #     MONGO_INITDB_DATABASE: slack-bot
+  #   volumes:
+  #     - mongodb-data:/data/db
   redis:
     image: redis:7.0.0
     restart: always

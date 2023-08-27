@@ -1,4 +1,6 @@
-def chatBotModalView():
+from app.constants.projects import *
+
+def ChatBotModalView():
     payload = {
         "type": "modal",
         "callback_id": "modal-identifier",
@@ -37,7 +39,7 @@ def updatedChatView(response):
                     "type": "section",
                     "text": {
                         "type": "plain_text",
-                        "text": f"your response recorded: {response}",
+                        "text": f"Response: {response}",
                         },
                     }
                 ],
@@ -74,3 +76,30 @@ def chatPreview(response):
         ]
     }
     return payload
+
+def identify_project_from_message(message):
+    project_id_idx, project_name_idx  = -1, -1
+    for i, val in enumerate(PROJECT_ID_LIST):
+        if val in message.upper():
+            project_id_idx = i
+            break
+
+    if project_id_idx == -1:
+        for i, val in enumerate(PROJECT_NAME_LIST):
+            if val in message.upper():
+                project_name_idx = i
+                break
+    
+    if project_id_idx != -1:
+        return PROJECTS_LIST[project_id_idx]["id"]
+    if project_name_idx != -1:
+        return PROJECTS_LIST[project_name_idx]["id"]
+
+    return None
+
+def get_project_id(ticker_number, message):
+    if not ticker_number:
+        project_id = identify_project_from_message(message)
+        return project_id
+    project_id = ticker_number.split("-")[0].upper()
+    return PROJECT_NAME_ID_MAPPING.get(project_id, None)
