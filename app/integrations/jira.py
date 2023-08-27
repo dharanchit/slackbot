@@ -21,6 +21,9 @@ class Jira:
         # API To create issue
         payload = {
             "fields": {
+                "assignee": {
+                    "id": info["assignee_id"]
+                },
                 "description": {
                     "content": [
                         {

@@ -8,8 +8,8 @@ import json
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 import ssl
-# from app.integrations.langchain.classifier import generate_suggestions
-from app.integrations.intelligence.predictions import generate_results
+from app.integrations.intelligence.predictions import generate_results, get_closest_match_by_name
+
 
 ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False
@@ -67,8 +67,6 @@ def create_app():
         try:
             block_id = payload['view']['blocks'][0]['block_id']
             submitted_value = payload['view']['state']['values'][block_id]['input-action']['value']
-            app.logger.info(payload)
-            app.logger.info("PayloadPayloadPayloadPayloadPayloadPayloadPayload")
             app.logger.info(submitted_value)
             app.logger.info("USER MESSAGEE+++++++")
 
@@ -85,17 +83,37 @@ def create_app():
             app.logger.info("project_id")
             if not project_id:
                 return jsonify(updatedChatView("Failed to identify your project id"))
+            
+            reporter = get_closest_match_by_name(payload["user"]["username"].lower())
+            app.logger.info(reporter)
+            app.logger.info("reporterreporterreporterreporterreporter")
+            if not reporter:
+                return jsonify(updatedChatView("Error Identifying Reporter"))
 
+            assignee = get_closest_match_by_name(prediction[0]["Assignee"].lower())
+
+            app.logger.info(prediction[0]["Assignee"])
+            app.logger.info("reporterreporterreporterreporterreporter")
+            app.logger.info(assignee)
+
+            if not assignee:
+                assign_to = reporter["accountId"]
+            else:
+                assign_to = assignee["accountId"]
 
             body = {
-                "ASSIGN_TO": prediction[0]["Assignee"],
+                "ASSIGN_TO": assign_to,
                 "TICKET_NO": prediction[0]["TicketNo"],
                 "PROJECT_ID": project_id,
                 "SUMMARY": "TEST Ticket",
                 "ACTION_TYPE": "CREATE" if prediction[0]["Task"] == "Create Ticket" else "UPDATE",
                 "DESCRIPTION": "",
-                "SUB_TYPE": "TICKET"
+                "SUB_TYPE": "TICKET",
+                "REPORTER_ID": reporter["accountId"]
             }
+
+            app.logger.info(body)
+            app.logger.info("BODTYTTTTTT")
 
             # generation_ops(body)
 

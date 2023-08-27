@@ -7,3 +7,5 @@ requests==2.31.0
 transformers==4.32.0
 slack-sdk==3.21.3
 tensorflow==2.13.0
+Levenshtein==0.21.1
+scikit-learn==1.2.2

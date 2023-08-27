@@ -1,12 +1,12 @@
 PROJECTS_LIST = [
   {
     "id": "10348",
-    "project_name": "Magnifi Consumer",
+    "project_name": "magnifi",
     "key": "MC"
   },
   {
     "id": "10337",
-    "project_name": "Wealth",
+    "project_name": "wealth",
     "key": "WC"
   }
 ]
