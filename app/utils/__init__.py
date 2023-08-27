@@ -103,3 +103,19 @@ def get_project_id(ticker_number, message):
         return project_id
     project_id = ticker_number.split("-")[0].upper()
     return PROJECT_NAME_ID_MAPPING.get(project_id, None)
+
+def format_response_message(prediction_obj):
+    assignee =prediction_obj[0].get('Assignee','')
+    ticket = prediction_obj[0].get('TicketNo','')
+    message = prediction_obj[0].get('Text','').upper()
+    project =  'Magnifi Consumer' if("MC" in ticket or 'MAGNIFI CONSUMER' in message) else 'WEALTH' 
+    action = prediction_obj[0].get('Task','').split(" ")[0].upper()
+    if(action == 'CREATE'):
+        return f"Woahh! 🎉 The Jira ticket in {project} project has been created and assigned to {assignee}. Keep up the great work!"
+    else:
+        return f"Woahh! 🎉 The Jira ticket {ticket} for the {project} project has been updated and assigned to {assignee}. Keep up the great work!"
+
+
+
+
+
