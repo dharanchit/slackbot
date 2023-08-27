@@ -1,9 +1,13 @@
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 import tensorflow as tf
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import re
 import pickle
 import os
 from pathlib import Path
+from app.constants.projects import PROJECTS_LIST
+from app.constants.users import USER_NEW
 
 current_dir = Path(__file__).parent
 
@@ -16,16 +20,23 @@ def load_model_and_tokenizer(model_path, tokenizer_path):
 
 # Function to extract information from text
 def extract_info_from_text(text):
-    ticket_pattern = r'\b[A-Za-z]+-[A-Za-z0-9]+\b'
-    name_pattern = r'\bto\s+([A-Za-z][A-Za-z\s]+)\b'
+    ticket_pattern = r'\b[A-Z]+-[A-Z0-9]+\b'
+    name_pattern = r'\bto\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b'
 
-    extracted_tickets = re.findall(ticket_pattern, text, re.IGNORECASE)
+    extracted_tickets = re.findall(ticket_pattern, text, re.IGNORECASE)  # Make it case-insensitive
     ticketNumber = extracted_tickets[0] if extracted_tickets else ""
 
-    match = re.search(name_pattern, text, re.IGNORECASE)
+    match = re.search(name_pattern, text, re.IGNORECASE)  # Make it case-insensitive
     userName = match.group(1).title() if match else ""
 
-    return {"Assignee": userName, "TicketNo": ticketNumber}
+    matching_projects = []
+    for project in PROJECTS_LIST:
+        project_name = project["project_name"].lower()
+        project_key = project["key"].lower()
+        if project_name in text.lower() or project_key in text.lower():
+            matching_projects.append(project)
+
+    return {"Assignee":userName, "TicketNo":ticketNumber, "MatchingProjects": matching_projects}
 
 # Function to make predictions using the loaded model and tokenizer
 def make_predictions(model, tokenizer, max_sequence_length, test_data):
@@ -40,7 +51,6 @@ def make_predictions(model, tokenizer, max_sequence_length, test_data):
         else:
             label = "Create Ticket"
         
-        userName, ticketNumber = extract_info_from_text(test_data[i])
         info_dict = extract_info_from_text(test_data[i])
         info_dict["Text"] = test_data[i]
         info_dict["Task"] = label
@@ -57,17 +67,6 @@ tokenizer_path = str(current_dir) + '/tokenizer.pkl'
 # Load the model and tokenizer
 loaded_model, loaded_tokenizer = load_model_and_tokenizer(model_path, tokenizer_path)
 
-
-
-###### below code is the example for how to use this model
-
-# # Define the test dataset
-# test_data = [
-#     "Create a new ticket for the server maintenance scheduled for this weekend.",
-#     "Update ticket IT-7823 with the latest information and assign it to Sarah Wilson.",
-#     # ... (other test data)
-# ]
-
 # # Maximum sequence length
 max_sequence_length = loaded_model.layers[0].input_length
 
@@ -75,7 +74,18 @@ max_sequence_length = loaded_model.layers[0].input_length
 def generate_results(user_input):
     predictions = make_predictions(loaded_model, loaded_tokenizer, max_sequence_length, user_input)
     return predictions
-# # Print predictions
-# for prediction in predictions:
-#     print(prediction)
-#     print()
+
+def get_closest_match_by_name(reporter_name):
+    texts = [entry['displayName'] for entry in USER_NEW]
+    texts.append(reporter_name)  # Add the target_string to the list of texts
+    
+    vectorizer = TfidfVectorizer()
+    tfidf_matrix = vectorizer.fit_transform(texts)
+    
+    target_vector = tfidf_matrix[-1]  # The last vector corresponds to the target_string
+    similarities = cosine_similarity(target_vector, tfidf_matrix[:-1])
+    
+    closest_index = similarities.argmax()
+    closest_match = USER_NEW[closest_index]
+    
+    return closest_match
